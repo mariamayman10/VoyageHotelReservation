@@ -1,9 +1,47 @@
 package org.example.voyage.hotel;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.example.voyage.hotel.dto.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/hotel")
 public class HotelController {
+    private final HotelService hotelService;
+
+    public HotelController(HotelService hotelService) {
+        this.hotelService = hotelService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<HotelResponse>> getHotels(@Valid @RequestBody SearchCriteria criteria) {
+        return null;
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<HotelResponse> getHotelById(@PathVariable UUID id) {
+        return null;
+    }
+    @PostMapping
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<HotelDetailedResponse> create(@Valid @RequestBody CreateHotelRequest request, @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.create(request, userDetails));
+    }
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<HotelDetailedResponse> update(@PathVariable UUID id, @Valid @RequestBody UpdateHotelRequest request) {
+        return null;
+    }
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        return null;
+    }
 }
