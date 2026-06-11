@@ -17,6 +17,7 @@ public class UpdateHotelRequest {
     @Pattern(regexp = "^(?!\\s*$).+", message = "Hotel name can't be blank")
     @Size(max = 150)
     private String name;
+    @Pattern(regexp = "^(?!\\s*$).*$", message = "Description can't be empty spaces only")
     private String description;
     @Pattern(regexp = "^(?!\\s*$).+", message = "Country can't be blank")
     @Size(max = 100)
@@ -35,5 +36,5 @@ public class UpdateHotelRequest {
     @Pattern(regexp = "^(?!\\s*$).+", message = "Contact email can't be blank")
     @Email(message = "Invalid contact email")
     private String contactEmail;
-    private Set<UUID> amenityIds;
+    private Set<UUID> amenities;
 }

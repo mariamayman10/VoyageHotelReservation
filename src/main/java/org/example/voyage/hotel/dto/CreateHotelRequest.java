@@ -36,5 +36,5 @@ public class CreateHotelRequest {
     @NotBlank(message = "Contact email can't be blank")
     @Email(message = "Invalid contact email")
     private String contactEmail;
-    private Set<UUID> amenityIds;
+    private Set<UUID> amenities;
 }
