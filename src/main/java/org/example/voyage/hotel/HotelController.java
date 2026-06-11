@@ -36,8 +36,8 @@ public class HotelController {
     }
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER')")
-    public ResponseEntity<HotelDetailedResponse> update(@PathVariable UUID id, @Valid @RequestBody UpdateHotelRequest request) {
-        return null;
+    public ResponseEntity<HotelDetailedResponse> update(@PathVariable UUID id, @Valid @RequestBody UpdateHotelRequest request, @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.status(HttpStatus.OK).body(hotelService.update(id, request, userDetails));
     }
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER')")
