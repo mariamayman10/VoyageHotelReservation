@@ -7,4 +7,5 @@ import java.util.UUID;
 
 @Repository
 public interface AmenityRepository extends JpaRepository<Amenity, UUID> {
+    boolean existsByIdAndHotelsIsNotEmpty(UUID id);
 }
