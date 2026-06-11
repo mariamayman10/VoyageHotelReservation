@@ -43,7 +43,7 @@ public class Hotel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id", nullable = false)
     private User manager;
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany
     @JoinTable(
             name = "hotel_amenities",
             joinColumns = @JoinColumn(name = "hotel_id"),
