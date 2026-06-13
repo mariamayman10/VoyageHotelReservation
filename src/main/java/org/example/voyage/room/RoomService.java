@@ -6,9 +6,7 @@ import org.example.voyage.exception.NotFoundException;
 import org.example.voyage.exception.RoomInUseException;
 import org.example.voyage.hotel.Hotel;
 import org.example.voyage.hotel.HotelRepository;
-import org.example.voyage.room.dto.CreateRoomRequest;
-import org.example.voyage.room.dto.RoomResponse;
-import org.example.voyage.room.dto.UpdateRoomRequest;
+import org.example.voyage.room.dto.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -27,18 +25,18 @@ public class RoomService {
     }
 
     @Transactional
-    public RoomResponse create(CreateRoomRequest request, UserDetails userDetails) {
+    public RoomDetailedResponse create(CreateRoomRequest request, UserDetails userDetails) {
         Hotel hotel = checkHotelOwnership(request.getHotel(), userDetails);
         Room room = roomMapper.toEntity(request);
         room.setHotel(hotel);
-        return roomMapper.toResponse(roomRepository.save(room));
+        return roomMapper.toDetailedResponse(roomRepository.save(room));
     }
 
     @Transactional
-    public RoomResponse update(UUID id, UpdateRoomRequest request, UserDetails userDetails) {
+    public RoomDetailedResponse update(UUID id, UpdateRoomRequest request, UserDetails userDetails) {
         Room room = checkRoomOwnership(id, userDetails);
         roomMapper.updateRoom(request, room);
-        return roomMapper.toResponse(roomRepository.save(room));
+        return roomMapper.toDetailedResponse(roomRepository.save(room));
     }
 
     @Transactional
