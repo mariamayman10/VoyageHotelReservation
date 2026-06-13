@@ -9,10 +9,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/room")
+@RequestMapping("/api/rooms")
 public class RoomController {
     private final RoomService roomService;
 
@@ -42,5 +43,10 @@ public class RoomController {
     @GetMapping("/{id}")
     public ResponseEntity<RoomResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.findById(id));
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<List<RoomResponse>> getAllAvailableRooms(PublicRoomSearchCriteria criteria) {
+        return ResponseEntity.status(HttpStatus.OK).body(roomService.findAllRooms(criteria));
     }
 }

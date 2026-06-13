@@ -7,10 +7,16 @@ import org.example.voyage.exception.RoomInUseException;
 import org.example.voyage.hotel.Hotel;
 import org.example.voyage.hotel.HotelRepository;
 import org.example.voyage.room.dto.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import static org.example.voyage.room.RoomSpecification.*;
 
 @Service
 public class RoomService {
@@ -52,6 +58,24 @@ public class RoomService {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Room not found"));
         return roomMapper.toResponse(room);
+    }
+
+    public List<RoomResponse> findAllRooms(PublicRoomSearchCriteria criteria) {
+        List<Specification<Room>> specs = new ArrayList<>();
+        specs.add(isAvailableForDates(criteria.getCheckInDate(), criteria.getCheckOutDate()));
+        specs.add(byCapacity(criteria.getCapacity()));
+        if(criteria.getCity() != null && !criteria.getCity().isBlank())
+            specs.add(byCity(criteria.getCity()));
+        if(criteria.getType() != null && !criteria.getType().name().isBlank())
+            specs.add(byRoomType(criteria.getType()));
+        if(criteria.getMinPrice() != null)
+            specs.add(byMinPrice(criteria.getMinPrice()));
+        if(criteria.getMaxPrice() != null)
+            specs.add(byMaxPrice(criteria.getMaxPrice()));
+
+        PageRequest pageable = PageRequest.of(criteria.getPage(), criteria.getSize());
+        Specification<Room> spec = Specification.allOf(specs);
+        return roomRepository.findAll(spec, pageable).map(roomMapper::toResponse).toList();
     }
 
     private Hotel checkHotelOwnership(UUID hotelId, UserDetails userDetails) {
