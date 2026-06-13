@@ -51,13 +51,7 @@ public class HotelService {
 
     @Transactional
     public HotelDetailedResponse update(UUID hotelId, UpdateHotelRequest request, UserDetails userDetails) {
-        Hotel hotel = hotelRepository.findById(hotelId)
-                .orElseThrow(() -> new NotFoundException("Hotel not found"));
-        User manager = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new NotFoundException("Manager not found"));
-        if(!hotel.getManager().getId().equals(manager.getId())){
-            throw new NotAuthorizedException("You are not allowed to modify other managers' hotels");
-        }
+        Hotel hotel = checkHotelOwn(hotelId, userDetails);
         hotelMapper.updateHotel(request, hotel);
         if (request.getAmenities() != null){
             if (request.getAmenities().isEmpty()) {
@@ -101,6 +95,12 @@ public class HotelService {
     }
 
     public void delete(UUID hotelId, UserDetails userDetails) {
+        Hotel hotel = checkHotelOwn(hotelId, userDetails);
+        // TODO: CHECK FOR CURRENT/UPCOMING BOOKINGS, IF EXIST REJECT DELETION
+        hotelRepository.delete(hotel);
+    }
+
+    private Hotel checkHotelOwn(UUID hotelId, UserDetails userDetails) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new NotFoundException("Hotel not found"));
         User manager = userRepository.findByEmail(userDetails.getUsername())
@@ -108,9 +108,7 @@ public class HotelService {
         if(!hotel.getManager().getId().equals(manager.getId())){
             throw new NotAuthorizedException("You are not allowed to modify other managers' hotels");
         }
-        // TODO: CHECK FOR CURRENT/UPCOMING BOOKINGS, IF EXIST REJECT DELETION
-        hotelRepository.delete(hotel);
+        return hotel;
     }
-
 
 }
