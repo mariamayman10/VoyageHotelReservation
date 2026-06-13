@@ -42,11 +42,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/amenity/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/amenity/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/amenity/**").hasRole("ADMIN")
-                        // hotels
-                        .requestMatchers(HttpMethod.POST,"/api/hotel/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.PUT,"/api/hotel/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.DELETE,"/api/hotel/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.GET,"/api/hotel/**").permitAll()
+                        // hotels and rooms
+                        .requestMatchers(HttpMethod.POST,"/api/hotel/**", "/api/room/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.PUT,"/api/hotel/**", "/api/room/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/hotel/**", "/api/room/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.GET,"/api/hotel/**", "/api/room/**").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
