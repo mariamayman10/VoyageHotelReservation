@@ -33,9 +33,8 @@ public class HotelController {
     }
     @GetMapping("/{id}")
     public ResponseEntity<HotelResponse> getHotelById(@PathVariable UUID id) {
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(hotelService.getHotelById(id));
     }
-
     @PostMapping
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<HotelDetailedResponse> create(@Valid @RequestBody CreateHotelRequest request, @AuthenticationPrincipal UserDetails userDetails) {

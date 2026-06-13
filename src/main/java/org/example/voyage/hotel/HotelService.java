@@ -4,10 +4,7 @@ import org.example.voyage.amenity.Amenity;
 import org.example.voyage.amenity.AmenityRepository;
 import org.example.voyage.exception.NotAuthorizedException;
 import org.example.voyage.exception.NotFoundException;
-import org.example.voyage.hotel.dto.CreateHotelRequest;
-import org.example.voyage.hotel.dto.HotelDetailedResponse;
-import org.example.voyage.hotel.dto.SearchCriteria;
-import org.example.voyage.hotel.dto.UpdateHotelRequest;
+import org.example.voyage.hotel.dto.*;
 import org.example.voyage.user.User;
 import org.example.voyage.user.UserRepository;
 import org.springframework.data.domain.PageRequest;
@@ -76,18 +73,6 @@ public class HotelService {
         return hotelMapper.toHotelDetailedResponse(hotel);
     }
 
-    public void delete(UUID hotelId, UserDetails userDetails) {
-        Hotel hotel = hotelRepository.findById(hotelId)
-                .orElseThrow(() -> new NotFoundException("Hotel not found"));
-        User manager = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new NotFoundException("Manager not found"));
-        if(!hotel.getManager().getId().equals(manager.getId())){
-            throw new NotAuthorizedException("You are not allowed to modify other managers' hotels");
-        }
-        // TODO: CHECK FOR CURRENT/UPCOMING BOOKINGS, IF EXIST REJECT DELETION
-        hotelRepository.delete(hotel);
-    }
-
     @Transactional
     public List<HotelDetailedResponse> getManagerHotels(SearchCriteria criteria, UserDetails userDetails) {
         User manager = userRepository.findByEmail(userDetails.getUsername())
@@ -112,4 +97,22 @@ public class HotelService {
         return hotelRepository.findAll(spec, pageable).map(hotelMapper::toHotelDetailedResponse).toList();
     }
 
+    @Transactional
+    public HotelResponse getHotelById(UUID id){
+        Hotel hotel = hotelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Hotel not found"));
+        return hotelMapper.toHotelResponse(hotel);
+    }
+
+    public void delete(UUID hotelId, UserDetails userDetails) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new NotFoundException("Hotel not found"));
+        User manager = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new NotFoundException("Manager not found"));
+        if(!hotel.getManager().getId().equals(manager.getId())){
+            throw new NotAuthorizedException("You are not allowed to modify other managers' hotels");
+        }
+        // TODO: CHECK FOR CURRENT/UPCOMING BOOKINGS, IF EXIST REJECT DELETION
+        hotelRepository.delete(hotel);
+    }
 }
