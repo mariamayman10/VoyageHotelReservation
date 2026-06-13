@@ -23,13 +23,8 @@ public class HotelController {
     }
 
     @GetMapping
-    public ResponseEntity<List<HotelResponse>> getHotels(@Valid @RequestBody SearchCriteria criteria) {
-        return null;
-    }
-    @GetMapping("/manager")
-    @PreAuthorize("hasRole('MANAGER')")
-    public ResponseEntity<List<HotelDetailedResponse>> getHotelsByManager(@Valid @ParameterObject @ModelAttribute SearchCriteria criteria, @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.status(HttpStatus.OK).body(hotelService.getManagerHotels(criteria, userDetails));
+    public ResponseEntity<List<HotelResponse>> getHotels(@Valid @ParameterObject @ModelAttribute SearchCriteria criteria) {
+        return ResponseEntity.status(HttpStatus.OK).body(hotelService.getAllHotels(criteria));
     }
     @GetMapping("/{id}")
     public ResponseEntity<HotelResponse> getHotelById(@PathVariable UUID id) {
