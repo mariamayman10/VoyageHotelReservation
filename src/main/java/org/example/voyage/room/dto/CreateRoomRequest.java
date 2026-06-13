@@ -1,15 +1,10 @@
 package org.example.voyage.room.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import org.example.voyage.hotel.Hotel;
 import org.example.voyage.room.Room;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
