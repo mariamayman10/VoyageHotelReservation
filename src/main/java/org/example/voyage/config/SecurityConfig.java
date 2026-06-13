@@ -38,15 +38,15 @@ public class SecurityConfig {
                         )
                         .permitAll()
                         // amenities
-                        .requestMatchers(HttpMethod.GET, "/api/amenity/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/amenity/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/amenity/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/amenity/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/amenities/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/amenities/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/amenities/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/amenities/**").hasRole("ADMIN")
                         // hotels and rooms
-                        .requestMatchers(HttpMethod.POST,"/api/hotel/**", "/api/room/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.PUT,"/api/hotel/**", "/api/room/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.DELETE,"/api/hotel/**", "/api/room/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.GET,"/api/hotel/**", "/api/room/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/hotels/**", "/api/rooms/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.PUT,"/api/hotels/**", "/api/rooms/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/hotels/**", "/api/rooms/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.GET,"/api/hotels/**", "/api/rooms/**").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
