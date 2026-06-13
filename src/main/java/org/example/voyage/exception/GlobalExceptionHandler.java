@@ -34,6 +34,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNotAuthorized(NotAuthorizedException e){
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
     }
+    @ExceptionHandler(RoomInUseException.class)
+    public ResponseEntity<ErrorResponse> handleNotAuthorized(RoomInUseException e){
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e){

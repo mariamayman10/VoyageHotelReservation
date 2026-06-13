@@ -33,4 +33,11 @@ public class RoomController {
     public ResponseEntity<RoomResponse> update(@PathVariable UUID id, @Valid @RequestBody UpdateRoomRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.update(id, request, userDetails));
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<RoomResponse> delete(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
+        roomService.delete(id, userDetails);
+        return ResponseEntity.noContent().build();
+    }
 }
