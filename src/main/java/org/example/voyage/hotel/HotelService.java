@@ -83,4 +83,29 @@ public class HotelService {
         // TODO: CHECK FOR CURRENT/UPCOMING BOOKINGS, IF EXIST REJECT DELETION
         hotelRepository.delete(hotel);
     }
+
+    @Transactional
+    public List<HotelDetailedResponse> getManagerHotels(SearchCriteria criteria, UserDetails userDetails) {
+        User manager = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new NotFoundException("Manager not found"));
+
+        List<Specification<Hotel>> specs = new ArrayList<>();
+        specs.add(byManager(manager));
+        if (criteria.getQuery() != null && !criteria.getQuery().isBlank())
+            specs.add(byQuery(criteria.getQuery()));
+        if (criteria.getCountry() != null && !criteria.getCountry().isBlank())
+            specs.add(byCountry(criteria.getCountry()));
+        if (criteria.getCity() != null && !criteria.getCity().isBlank())
+            specs.add(byCity(criteria.getCity()));
+        if (criteria.getAmenityIds() != null && !criteria.getAmenityIds().isEmpty())
+            specs.add(byAmenityIds(criteria.getAmenityIds()));
+        Sort sort = Sort.by(
+                Sort.Direction.fromString(criteria.getSortDirection().name()),
+                criteria.getSortBy()
+        );
+        PageRequest pageable = PageRequest.of(criteria.getPage(), criteria.getSize(), sort);
+        Specification<Hotel> spec = Specification.allOf(specs);
+        return hotelRepository.findAll(spec, pageable).map(hotelMapper::toHotelDetailedResponse).toList();
+    }
+
 }

@@ -2,6 +2,7 @@ package org.example.voyage.hotel;
 
 import jakarta.validation.Valid;
 import org.example.voyage.hotel.dto.*;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,10 +26,16 @@ public class HotelController {
     public ResponseEntity<List<HotelResponse>> getHotels(@Valid @RequestBody SearchCriteria criteria) {
         return null;
     }
+    @GetMapping("/manager")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<List<HotelDetailedResponse>> getHotelsByManager(@Valid @ParameterObject @ModelAttribute SearchCriteria criteria, @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.status(HttpStatus.OK).body(hotelService.getManagerHotels(criteria, userDetails));
+    }
     @GetMapping("/{id}")
     public ResponseEntity<HotelResponse> getHotelById(@PathVariable UUID id) {
         return null;
     }
+
     @PostMapping
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<HotelDetailedResponse> create(@Valid @RequestBody CreateHotelRequest request, @AuthenticationPrincipal UserDetails userDetails) {
