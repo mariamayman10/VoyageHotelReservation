@@ -71,4 +71,16 @@ public class HotelService {
         hotel = hotelRepository.save(hotel);
         return hotelMapper.toHotelDetailedResponse(hotel);
     }
+
+    public void delete(UUID hotelId, UserDetails userDetails) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new NotFoundException("Hotel not found"));
+        User manager = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new NotFoundException("Manager not found"));
+        if(!hotel.getManager().getId().equals(manager.getId())){
+            throw new NotAuthorizedException("You are not allowed to modify other managers' hotels");
+        }
+        // TODO: CHECK FOR CURRENT/UPCOMING BOOKINGS, IF EXIST REJECT DELETION
+        hotelRepository.delete(hotel);
+    }
 }

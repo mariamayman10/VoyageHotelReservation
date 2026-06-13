@@ -41,7 +41,8 @@ public class HotelController {
     }
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER')")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        return null;
+    public ResponseEntity<Void> delete(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
+        hotelService.delete(id, userDetails);
+        return ResponseEntity.noContent().build();
     }
 }
