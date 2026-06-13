@@ -7,11 +7,21 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class RoomSpecification {
+    public static Specification<Room> byHotelId(UUID hotelId) {
+        return (root, q, cb) ->
+                cb.equal(root.get("hotel").get("id"), hotelId);
+    }
     public static Specification<Room> byRoomType(Room.RoomType type) {
         return (root, q, cb) ->
                 cb.equal(root.get("type"), type);
+    }
+
+    public static Specification<Room> byRoomStatus(Room.RoomStatus status) {
+        return (root, q, cb) ->
+                cb.equal(root.get("status"), status);
     }
 
     public static Specification<Room> byCapacity(Integer capacity) {

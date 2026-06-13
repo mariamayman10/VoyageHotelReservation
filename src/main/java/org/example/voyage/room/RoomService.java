@@ -60,22 +60,32 @@ public class RoomService {
         return roomMapper.toResponse(room);
     }
 
-    public List<RoomResponse> findAllRooms(PublicRoomSearchCriteria criteria) {
-        List<Specification<Room>> specs = new ArrayList<>();
-        specs.add(isAvailableForDates(criteria.getCheckInDate(), criteria.getCheckOutDate()));
-        specs.add(byCapacity(criteria.getCapacity()));
-        if(criteria.getCity() != null && !criteria.getCity().isBlank())
-            specs.add(byCity(criteria.getCity()));
-        if(criteria.getType() != null && !criteria.getType().name().isBlank())
-            specs.add(byRoomType(criteria.getType()));
-        if(criteria.getMinPrice() != null)
-            specs.add(byMinPrice(criteria.getMinPrice()));
-        if(criteria.getMaxPrice() != null)
-            specs.add(byMaxPrice(criteria.getMaxPrice()));
-
+    public List<RoomResponse> findAllAvailableRooms(PublicRoomSearchCriteria criteria) {
+        Specification<Room> spec = buildPublicSpecs(criteria);
         PageRequest pageable = PageRequest.of(criteria.getPage(), criteria.getSize());
-        Specification<Room> spec = Specification.allOf(specs);
         return roomRepository.findAll(spec, pageable).map(roomMapper::toResponse).toList();
+    }
+
+    public List<RoomResponse> findAllAvailableRoomsOfHotel(UUID hotelId, PublicRoomSearchCriteria criteria) {
+        if(!hotelRepository.existsById(hotelId))
+            throw new NotFoundException("Hotel not found");
+        Specification<Room> spec = buildPublicSpecs(criteria).and(byHotelId(hotelId));
+        PageRequest pageable = PageRequest.of(criteria.getPage(), criteria.getSize());
+        return roomRepository.findAll(spec, pageable).map(roomMapper::toResponse).toList();
+    }
+
+    public List<RoomDetailedResponse> findAllRooms(ManagerRoomSearchCriteria criteria) {
+        PageRequest pageable = PageRequest.of(criteria.getPage(), criteria.getSize());
+        Specification<Room> spec = buildManagerSpecs(criteria);
+        return roomRepository.findAll(spec, pageable).map(roomMapper::toDetailedResponse).toList();
+    }
+
+    public List<RoomDetailedResponse> findAllRoomsOfHotel(UUID hotelId, ManagerRoomSearchCriteria criteria) {
+        if(!hotelRepository.existsById(hotelId))
+            throw new NotFoundException("Hotel not found");
+        PageRequest pageable = PageRequest.of(criteria.getPage(), criteria.getSize());
+        Specification<Room> spec = buildManagerSpecs(criteria).and(byHotelId(hotelId));
+        return roomRepository.findAll(spec, pageable).map(roomMapper::toDetailedResponse).toList();
     }
 
     private Hotel checkHotelOwnership(UUID hotelId, UserDetails userDetails) {
@@ -94,5 +104,33 @@ public class RoomService {
             throw new NotAuthorizedException("You can't access a room in another manager's hotel");
         }
         return room;
+    }
+
+    private Specification<Room> buildPublicSpecs(PublicRoomSearchCriteria criteria) {
+        List<Specification<Room>> specs = new ArrayList<>();
+        specs.add(isAvailableForDates(criteria.getCheckInDate(), criteria.getCheckOutDate()));
+        specs.add(byCapacity(criteria.getCapacity()));
+        if (criteria.getCity() != null && !criteria.getCity().isBlank())
+            specs.add(byCity(criteria.getCity()));
+        if (criteria.getType() != null)
+            specs.add(byRoomType(criteria.getType()));
+        if (criteria.getMinPrice() != null)
+            specs.add(byMinPrice(criteria.getMinPrice()));
+        if (criteria.getMaxPrice() != null)
+            specs.add(byMaxPrice(criteria.getMaxPrice()));
+        return Specification.allOf(specs);
+    }
+
+    private Specification<Room> buildManagerSpecs(ManagerRoomSearchCriteria criteria) {
+        List<Specification<Room>> specs = new ArrayList<>();
+        if (criteria.getType() != null)
+            specs.add(byRoomType(criteria.getType()));
+        if (criteria.getStatus() != null)
+            specs.add(byRoomStatus(criteria.getStatus()));
+        if (criteria.getMinPrice() != null)
+            specs.add(byMinPrice(criteria.getMinPrice()));
+        if (criteria.getMaxPrice() != null)
+            specs.add(byMaxPrice(criteria.getMaxPrice()));
+        return Specification.allOf(specs);
     }
 }
