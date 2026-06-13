@@ -32,6 +32,9 @@ public class Room {
     private String description;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    private RoomType type;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RoomStatus status = RoomStatus.AVAILABLE;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id", nullable = false)
@@ -44,5 +47,10 @@ public class Room {
         AVAILABLE,
         BOOKED,
         MAINTENANCE
+    }
+    public enum RoomType {
+        SINGLE,
+        DOUBLE,
+        SUITE
     }
 }
