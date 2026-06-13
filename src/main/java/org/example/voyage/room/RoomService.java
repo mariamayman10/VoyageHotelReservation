@@ -50,6 +50,12 @@ public class RoomService {
         roomRepository.delete(room);
     }
 
+    public RoomResponse findById(UUID id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Room not found"));
+        return roomMapper.toResponse(room);
+    }
+
     private Hotel checkHotelOwnership(UUID hotelId, UserDetails userDetails) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new NotFoundException("Hotel not found"));

@@ -40,4 +40,9 @@ public class RoomController {
         roomService.delete(id, userDetails);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RoomResponse> getById(@PathVariable UUID id) {
+        return ResponseEntity.status(HttpStatus.OK).body(roomService.findById(id));
+    }
 }
