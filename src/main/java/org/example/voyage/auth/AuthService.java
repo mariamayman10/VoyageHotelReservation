@@ -6,6 +6,7 @@ import org.example.voyage.security.UserPrincipal;
 import org.example.voyage.user.User;
 import org.example.voyage.user.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.example.voyage.auth.dto.AuthResponse;
@@ -44,10 +45,18 @@ public class AuthService {
         return new AuthResponse(jwtService.generateToken(userPrincipal));
     }
     public AuthResponse login(LoginRequest request){
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException ex) {
+            throw new InvalidCredentialsException("Invalid credentials");
+        }
         User user = userService.findByEmail(request.getEmail())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
-        System.out.println(user.getId());
         UserPrincipal principal = new UserPrincipal(
                 user.getId(),
                 user.getEmail(),
