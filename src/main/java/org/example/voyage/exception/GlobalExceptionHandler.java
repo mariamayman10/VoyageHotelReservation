@@ -35,7 +35,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
     }
     @ExceptionHandler(RoomInUseException.class)
-    public ResponseEntity<ErrorResponse> handleNotAuthorized(RoomInUseException e){
+    public ResponseEntity<ErrorResponse> handleRoomInUse(RoomInUseException e){
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
+    }
+    @ExceptionHandler(HotelHasReservationsException.class)
+    public ResponseEntity<ErrorResponse> handleHotelHasReservationsOnDeletion(HotelHasReservationsException e){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
     }
 

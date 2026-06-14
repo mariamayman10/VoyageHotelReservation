@@ -2,6 +2,7 @@ package org.example.voyage.hotel;
 
 import org.example.voyage.amenity.Amenity;
 import org.example.voyage.amenity.AmenityRepository;
+import org.example.voyage.exception.HotelHasReservationsException;
 import org.example.voyage.exception.NotAuthorizedException;
 import org.example.voyage.exception.NotFoundException;
 import org.example.voyage.hotel.dto.*;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 import static org.example.voyage.hotel.HotelSpecification.*;
 
@@ -96,7 +98,10 @@ public class HotelService {
 
     public void delete(UUID hotelId, UserDetails userDetails) {
         Hotel hotel = checkHotelOwn(hotelId, userDetails);
-        // TODO: CHECK FOR CURRENT/UPCOMING BOOKINGS, IF EXIST REJECT DELETION
+        boolean hasReservations = hotelRepository.hasReservations(hotelId, LocalDate.now());
+        if (hasReservations) {
+            throw new HotelHasReservationsException("Hotel can't be deleted while it has active reservations");
+        }
         hotelRepository.delete(hotel);
     }
 
