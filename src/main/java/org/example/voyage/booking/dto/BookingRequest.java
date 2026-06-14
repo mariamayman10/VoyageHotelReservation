@@ -1,5 +1,7 @@
 package org.example.voyage.booking.dto;
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.example.voyage.booking.CheckOutAfterCheckIn;
@@ -17,7 +19,9 @@ public class BookingRequest {
     @NotNull(message = "Room id must be provided")
     private UUID roomId;
     @NotNull(message = "Check in date must be provided")
+    @FutureOrPresent
     private LocalDate checkInDate;
     @NotNull(message = "Check out date must be provided")
+    @Future
     private LocalDate checkOutDate;
 }
