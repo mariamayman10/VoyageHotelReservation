@@ -18,5 +18,6 @@ public class RoomResponse {
     private int capacity;
     private BigDecimal pricePerNight;
     private String description;
+    private String hotelName;
     private Room.RoomType type;
 }

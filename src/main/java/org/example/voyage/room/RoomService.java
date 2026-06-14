@@ -1,6 +1,5 @@
 package org.example.voyage.room;
 
-import jakarta.transaction.Transactional;
 import org.example.voyage.exception.NotAuthorizedException;
 import org.example.voyage.exception.NotFoundException;
 import org.example.voyage.exception.RoomInUseException;
@@ -11,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +55,14 @@ public class RoomService {
     }
 
     public RoomResponse findById(UUID id) {
-        Room room = roomRepository.findById(id)
+        Room room = roomRepository.findByIdWithHotel(id)
                 .orElseThrow(() -> new NotFoundException("Room not found"));
         return roomMapper.toResponse(room);
+    }
+
+    public Room findRoomEntityById(UUID id) {
+        return roomRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Room not found"));
     }
 
     public List<RoomResponse> findAllAvailableRooms(PublicRoomSearchCriteria criteria) {

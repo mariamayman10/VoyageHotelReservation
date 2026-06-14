@@ -10,7 +10,9 @@ import org.mapstruct.*;
 public interface RoomMapper {
     @Mapping(target = "hotel", ignore = true)
     Room toEntity(CreateRoomRequest createRoomRequest);
+    @Mapping(target = "hotelName", source = "hotel.name")
     RoomDetailedResponse toDetailedResponse(Room room);
+    @Mapping(target = "hotelName", source = "hotel.name")
     RoomResponse toResponse(Room room);
     @BeanMapping(nullValuePropertyMappingStrategy =  NullValuePropertyMappingStrategy.IGNORE)
     void updateRoom(UpdateRoomRequest request, @MappingTarget Room room);
