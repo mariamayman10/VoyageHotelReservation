@@ -46,7 +46,7 @@ public class RoomController {
     }
 
     @GetMapping("/available")
-    public ResponseEntity<List<RoomResponse>> getAllAvailableRooms(PublicRoomSearchCriteria criteria) {
+    public ResponseEntity<List<RoomResponse>> getAllAvailableRooms(@Valid PublicRoomSearchCriteria criteria) {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.findAllAvailableRooms(criteria));
     }
 }

@@ -1,5 +1,6 @@
 package org.example.voyage.room;
 
+import jakarta.validation.Valid;
 import org.example.voyage.room.dto.ManagerRoomSearchCriteria;
 import org.example.voyage.room.dto.PublicRoomSearchCriteria;
 import org.example.voyage.room.dto.RoomDetailedResponse;
@@ -26,16 +27,16 @@ public class HotelRoomController {
 
     @GetMapping("/rooms")
     @PreAuthorize("hasRole('MANAGER')")
-    public ResponseEntity<List<RoomDetailedResponse>> getAllRooms(ManagerRoomSearchCriteria criteria) {
+    public ResponseEntity<List<RoomDetailedResponse>> getAllRooms(@Valid ManagerRoomSearchCriteria criteria) {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.findAllRooms(criteria));
     }
     @GetMapping("/{hotelId}/rooms")
     @PreAuthorize("hasRole('MANAGER')")
-    public ResponseEntity<List<RoomDetailedResponse>> getAllRoomsOfHotel(@PathVariable UUID hotelId, ManagerRoomSearchCriteria criteria) {
+    public ResponseEntity<List<RoomDetailedResponse>> getAllRoomsOfHotel(@PathVariable UUID hotelId, @Valid ManagerRoomSearchCriteria criteria) {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.findAllRoomsOfHotel(hotelId, criteria));
     }
     @GetMapping("/{hotelId}/rooms/available")
-    public ResponseEntity<List<RoomResponse>> getAllAvailableRoomsOfHotel(@PathVariable UUID hotelId, PublicRoomSearchCriteria criteria) {
+    public ResponseEntity<List<RoomResponse>> getAllAvailableRoomsOfHotel(@PathVariable UUID hotelId, @Valid PublicRoomSearchCriteria criteria) {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.findAllAvailableRoomsOfHotel(hotelId, criteria));
     }
 }
