@@ -19,5 +19,5 @@ public class BookingResponse {
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private BigDecimal totalPrice;
-    private Booking.BookingStatus bookingStatus;
+    private Booking.BookingStatus status;
 }

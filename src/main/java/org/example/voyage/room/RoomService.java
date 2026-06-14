@@ -60,8 +60,8 @@ public class RoomService {
         return roomMapper.toResponse(room);
     }
 
-    public Room findRoomEntityById(UUID id) {
-        return roomRepository.findById(id)
+    public Room findRoomEntityByIdWithLock(UUID id) {
+        return roomRepository.findByIdWithLock(id)
                 .orElseThrow(() -> new NotFoundException("Room not found"));
     }
 

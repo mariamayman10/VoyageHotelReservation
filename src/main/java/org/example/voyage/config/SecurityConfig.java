@@ -47,6 +47,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT,"/api/hotels/**", "/api/rooms/**").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.DELETE,"/api/hotels/**", "/api/rooms/**").hasRole("MANAGER")
                         .requestMatchers(HttpMethod.GET,"/api/hotels/**", "/api/rooms/**").permitAll()
+                        // bookings
+                        .requestMatchers(HttpMethod.POST,"/api/bookings/**").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/bookings/**").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/bookings/**").hasRole("MANAGER")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
