@@ -17,7 +17,6 @@ import java.util.UUID;
 
 @Entity
 @Getter @Setter
-@CheckOutAfterCheckIn
 @Table(name = "bookings")
 public class Booking {
     @Id
@@ -26,9 +25,6 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    @ManyToOne
-    @JoinColumn(name = "hotel_id", nullable = false)
-    private Hotel hotel;
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
@@ -40,7 +36,7 @@ public class Booking {
     private BigDecimal totalPrice;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BookingStatus status = BookingStatus.PENDING;
+    private BookingStatus status = BookingStatus.CONFIRMED;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp
