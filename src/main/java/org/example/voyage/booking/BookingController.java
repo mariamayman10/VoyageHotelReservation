@@ -36,6 +36,7 @@ public class BookingController {
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<Void> cancel(UUID id, @AuthenticationPrincipal UserDetails userDetails) {
         bookingService.cancel(id, userDetails);
+        paymentService.refund(id);
         return ResponseEntity.noContent().build();
     }
 

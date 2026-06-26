@@ -24,4 +24,9 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> pay(@PathVariable UUID bookingId, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.pay(bookingId, userDetails));
     }
+
+    @PostMapping("/refund/{bookingId}")
+    public ResponseEntity<PaymentResponse> refund(@PathVariable UUID bookingId){
+        return ResponseEntity.status(HttpStatus.OK).body(paymentService.refund(bookingId));
+    }
 }

@@ -37,7 +37,7 @@ public class PaymentService {
         if(payment != null && payment.getStatus() == Payment.PaymentStatus.COMPLETED)
             throw new OperationCanNotBeCompleted("Payment is already completed");
         try {
-            Thread.sleep(90000);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -52,6 +52,22 @@ public class PaymentService {
 
         paymentRepository.save(payment);
 
+        return paymentMapper.toPaymentResponse(payment);
+    }
+
+    @Transactional
+    public PaymentResponse refund(UUID bookingId){
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking not found"));
+        if(!booking.getStatus().name().equals(Booking.BookingStatus.CANCELLED.name()))
+            throw new NotAuthorizedException("Can't refund an active booking");
+        Payment payment = paymentRepository.findByBookingId(bookingId);
+        payment.setStatus(Payment.PaymentStatus.REFUNDED);
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         return paymentMapper.toPaymentResponse(payment);
     }
 }
