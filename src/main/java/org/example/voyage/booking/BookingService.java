@@ -2,6 +2,7 @@ package org.example.voyage.booking;
 
 import org.example.voyage.booking.dto.BookingRequest;
 import org.example.voyage.booking.dto.BookingResponse;
+import org.example.voyage.exception.NotAuthorizedException;
 import org.example.voyage.exception.NotFoundException;
 import org.example.voyage.exception.RoomInUseException;
 import org.example.voyage.room.Room;
@@ -37,7 +38,7 @@ public class BookingService {
     public BookingResponse create(BookingRequest request, UserDetails userDetails) {
         Room room = roomService.findRoomEntityByIdWithLock(request.getRoomId());
         boolean isOverlapped = bookingRepository.existsOverlappingBooking(request.getRoomId(), request.getCheckInDate(), request.getCheckOutDate());
-        if(isOverlapped) {
+        if (isOverlapped) {
             throw new RoomInUseException("The room has been booked already");
         }
         Booking booking = bookingMapper.toEntity(request);
@@ -51,8 +52,16 @@ public class BookingService {
         return bookingMapper.toResponse(bookingRepository.save(booking));
     }
 
-    public BookingResponse cancel(UUID id, UserDetails userDetails) {
-        return null;
+    @Transactional
+    public void cancel(UUID id, UserDetails userDetails) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Booking not found"));
+        if (!booking.getUser().getEmail().equals(userDetails.getUsername())) {
+            throw new NotAuthorizedException("You are not allowed to cancel another user's booking");
+        }
+        if (booking.getCheckInDate().isAfter(LocalDate.now())) {
+            bookingRepository.delete(booking);
+        }
     }
 
 
