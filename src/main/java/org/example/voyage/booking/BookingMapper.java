@@ -7,6 +7,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring",  uses = RoomMapper.class)
 public interface BookingMapper {
     @Mappings({
@@ -16,4 +18,7 @@ public interface BookingMapper {
 
     @Mapping(target = "status", source = "status")
     BookingResponse toResponse(Booking booking);
+
+    @Mapping(target = "status", source = "status")
+    List<BookingResponse> toListResponse(List<Booking> bookings);
 }

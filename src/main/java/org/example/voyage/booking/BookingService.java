@@ -64,9 +64,24 @@ public class BookingService {
             throw new OperationCanNotBeCompleted("Booking is already cancelled");
         if (booking.getCheckInDate().isAfter(LocalDate.now()))
             bookingRepository.delete(booking);
-        }
         else throw new OperationCanNotBeCompleted("You can't cancel booking with a passed check-in date");
     }
 
+    @Transactional
+    public List<BookingResponse> getMyBookings(Pagination pagination, UserDetails userDetails) {
+        User user = userService.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        PageRequest pageable = PageRequest.of(pagination.getPage(), pagination.getSize());
+        List<Booking> bookings = bookingRepository.findAllByUser_Id(user.getId(), pageable);
+        return bookingMapper.toListResponse(bookings);
+    }
 
+    @Transactional
+    public BookingResponse getMyBookingById(UUID id, UserDetails userDetails) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Booking not found"));
+        if(booking.getUser().getEmail().equals(userDetails.getUsername()))
+            return bookingMapper.toResponse(booking);
+        else throw new NotAuthorizedException("You are not allowed to cancel another customer's booking");
+    }
 }
