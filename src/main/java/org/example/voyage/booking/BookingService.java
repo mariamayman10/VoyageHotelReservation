@@ -2,15 +2,16 @@ package org.example.voyage.booking;
 
 import org.example.voyage.booking.dto.BookingRequest;
 import org.example.voyage.booking.dto.BookingResponse;
+import org.example.voyage.booking.dto.Pagination;
 import org.example.voyage.exception.NotAuthorizedException;
 import org.example.voyage.exception.NotFoundException;
+import org.example.voyage.exception.OperationCanNotBeCompleted;
 import org.example.voyage.exception.RoomInUseException;
 import org.example.voyage.room.Room;
 import org.example.voyage.room.RoomService;
 import org.example.voyage.user.User;
 import org.example.voyage.user.UserService;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -56,12 +58,14 @@ public class BookingService {
     public void cancel(UUID id, UserDetails userDetails) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Booking not found"));
-        if (!booking.getUser().getEmail().equals(userDetails.getUsername())) {
+        if (!booking.getUser().getEmail().equals(userDetails.getUsername()))
             throw new NotAuthorizedException("You are not allowed to cancel another user's booking");
-        }
-        if (booking.getCheckInDate().isAfter(LocalDate.now())) {
+        if(booking.getStatus().equals(Booking.BookingStatus.CANCELLED))
+            throw new OperationCanNotBeCompleted("Booking is already cancelled");
+        if (booking.getCheckInDate().isAfter(LocalDate.now()))
             bookingRepository.delete(booking);
         }
+        else throw new OperationCanNotBeCompleted("You can't cancel booking with a passed check-in date");
     }
 
 

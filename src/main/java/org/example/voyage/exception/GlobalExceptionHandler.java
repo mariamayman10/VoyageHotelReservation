@@ -42,6 +42,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHotelHasReservationsOnDeletion(HotelHasReservationsException e){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
     }
+    @ExceptionHandler(OperationCanNotBeCompleted.class)
+    public ResponseEntity<ErrorResponse> handleRoomInUse(OperationCanNotBeCompleted e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e){
