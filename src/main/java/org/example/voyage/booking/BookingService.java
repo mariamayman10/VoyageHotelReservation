@@ -68,7 +68,7 @@ public class BookingService {
         if(booking.getStatus().equals(Booking.BookingStatus.CANCELLED))
             throw new OperationCanNotBeCompleted("Booking is already cancelled");
         if (booking.getCheckInDate().isAfter(LocalDate.now()))
-            bookingRepository.delete(booking);
+            booking.setStatus(Booking.BookingStatus.CANCELLED);
         else throw new OperationCanNotBeCompleted("You can't cancel booking with a passed check-in date");
     }
 
@@ -87,7 +87,7 @@ public class BookingService {
                 .orElseThrow(() -> new NotFoundException("Booking not found"));
         if(booking.getUser().getEmail().equals(userDetails.getUsername()))
             return bookingMapper.toResponse(booking);
-        else throw new NotAuthorizedException("You are not allowed to cancel another customer's booking");
+        else throw new NotAuthorizedException("You are not allowed to access another customer's booking");
     }
 
     @Transactional
