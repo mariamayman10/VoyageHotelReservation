@@ -2,6 +2,7 @@ package org.example.voyage.booking;
 
 import jakarta.validation.Valid;
 import org.example.voyage.booking.dto.*;
+import org.example.voyage.payment.PaymentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,15 +17,19 @@ import java.util.UUID;
 @RequestMapping("/api")
 public class BookingController {
     private final BookingService bookingService;
+    private final PaymentService paymentService;
 
-    public BookingController(BookingService bookingService) {
+    public BookingController(BookingService bookingService, PaymentService paymentService) {
         this.bookingService = bookingService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping("/bookings")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<BookingResponse> create(@Valid @RequestBody BookingRequest booking, @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.create(booking, userDetails));
+        BookingResponse bookingResponse = bookingService.create(booking, userDetails);
+        paymentService.pay(bookingResponse.getId(), userDetails);
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookingResponse);
     }
 
     @DeleteMapping("/bookings")

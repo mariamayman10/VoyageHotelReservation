@@ -55,7 +55,7 @@ public class BookingService {
         booking.setRoom(room);
         BigDecimal days = new BigDecimal(ChronoUnit.DAYS.between(request.getCheckInDate(), request.getCheckOutDate()));
         booking.setTotalPrice(room.getPricePerNight().multiply(days));
-        booking.setStatus(Booking.BookingStatus.CONFIRMED);
+        booking.setStatus(Booking.BookingStatus.PENDING);
         return bookingMapper.toResponse(bookingRepository.save(booking));
     }
 
