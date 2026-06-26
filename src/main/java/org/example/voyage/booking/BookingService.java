@@ -107,4 +107,16 @@ public class BookingService {
         PageRequest pageable = PageRequest.of(criteria.getPage(), criteria.getSize());
         return bookingRepository.findAll(spec, pageable).map(bookingMapper::toManagerBookingResponse).toList();
     }
+
+    @Transactional
+    public ManagerBookingResponse getBookingById(UUID hotelId, UUID bookingId, UserDetails userDetails) {
+        Hotel hotel = hotelService.getHotelEntityById(hotelId);
+        if(!hotel.getManager().getEmail().equals(userDetails.getUsername()))
+            throw new NotAuthorizedException("You are not allowed to access another hotel's bookings");
+        Booking booking =  bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking not found"));
+        if(!booking.getRoom().getHotel().getId().equals(hotel.getId()))
+            throw new IllegalArgumentException("The booking doesn't belong to this hotel");
+        return bookingMapper.toManagerBookingResponse(booking);
+    }
 }
