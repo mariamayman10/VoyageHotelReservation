@@ -42,11 +42,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/amenities/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/amenities/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/amenities/**").hasRole("ADMIN")
-                        // hotels and rooms
-                        .requestMatchers(HttpMethod.POST,"/api/hotels/**", "/api/rooms/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.PUT,"/api/hotels/**", "/api/rooms/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.DELETE,"/api/hotels/**", "/api/rooms/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.GET,"/api/hotels/**", "/api/rooms/**").permitAll()
+                        // hotels
+                        .requestMatchers(HttpMethod.POST,"/api/hotels/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.PUT,"/api/hotels/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/hotels/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.GET,"/api/hotels/**").permitAll()
+                        // rooms
+                        .requestMatchers(HttpMethod.POST,"/api/rooms/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.PUT,"/api/rooms/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/rooms/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.GET,"/api/rooms/my/**").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.GET,"/api/rooms/**").permitAll()
                         // bookings
                         .requestMatchers(HttpMethod.POST,"/api/bookings/**").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.DELETE,"/api/bookings/**").hasRole("CUSTOMER")

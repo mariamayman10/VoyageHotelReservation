@@ -45,6 +45,11 @@ public class RoomSpecification {
                 cb.lessThanOrEqualTo(root.get("pricePerNight"), maxPrice);
     }
 
+    public static Specification<Room> byManagerId(String username) {
+        return (root, query, cb) ->
+                cb.equal(root.get("hotel").get("manager").get("email"), username);
+    }
+
     public static Specification<Room> isAvailableForDates(LocalDate checkInDate, LocalDate checkOutDate) {
         return (root, q, cb) -> {
             Subquery<Long> subquery = q.subquery(Long.class);

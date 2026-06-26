@@ -44,9 +44,19 @@ public class RoomController {
     public ResponseEntity<RoomResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.findById(id));
     }
-
     @GetMapping("/available")
-    public ResponseEntity<List<RoomResponse>> getAllAvailableRooms(@Valid PublicRoomSearchCriteria criteria) {
-        return ResponseEntity.status(HttpStatus.OK).body(roomService.findAllAvailableRooms(criteria));
+    public ResponseEntity<List<RoomResponse>> getAllAvailableRooms(
+            @RequestParam(required = false) UUID hotelId,
+            @Valid PublicRoomSearchCriteria criteria) {
+        return ResponseEntity.ok(roomService.findAllAvailableRooms(hotelId, criteria));
+    }
+
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<List<RoomDetailedResponse>> getManagerRooms(
+            @RequestParam(required = false) UUID hotelId,
+            @Valid ManagerRoomSearchCriteria criteria,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(roomService.findAllRooms(hotelId, criteria, userDetails));
     }
 }
