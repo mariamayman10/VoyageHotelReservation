@@ -26,15 +26,9 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentStatus status;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PaymentMethod paymentMethod;
     @CreationTimestamp
     private LocalDateTime paidAt;
     public enum PaymentStatus {
-        PENDING, COMPLETED, CANCELLED
-    }
-    public enum PaymentMethod {
-        CREDIT, CASH
+        PENDING, COMPLETED, CANCELLED, REFUNDED
     }
 }
