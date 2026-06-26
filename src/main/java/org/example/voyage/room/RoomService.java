@@ -48,7 +48,7 @@ public class RoomService {
     @Transactional
     public void delete(UUID id, UserDetails userDetails) {
         Room room = checkRoomOwnership(id, userDetails);
-        if(room.getStatus().equals(Room.RoomStatus.BOOKED)){
+        if(roomRepository.hasActiveOrFutureBookings(id, LocalDate.now())){
             throw new RoomInUseException("Can't delete the room because it is already booked");
         }
         roomRepository.delete(room);

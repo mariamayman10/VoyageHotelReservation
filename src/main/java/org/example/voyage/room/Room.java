@@ -45,7 +45,6 @@ public class Room {
     private LocalDateTime updatedAt;
     public enum RoomStatus {
         AVAILABLE,
-        BOOKED,
         MAINTENANCE
     }
     public enum RoomType {

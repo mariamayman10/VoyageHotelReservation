@@ -6,8 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,4 +26,12 @@ public interface RoomRepository extends JpaRepository<Room, UUID>, JpaSpecificat
 
     @EntityGraph(attributePaths = "hotel")
     Page<Room> findAll(@NonNull Specification<Room> spec, @NonNull Pageable pageable);
+
+    @Query("""
+        SELECT COUNT(b) > 0 FROM Booking b
+        WHERE b.room.id = :roomId
+        AND b.status NOT IN ('CANCELLED')
+        AND b.checkOutDate > :today
+    """)
+    boolean hasActiveOrFutureBookings(@Param("roomId") UUID roomId, @Param("today") LocalDate today);
 }
