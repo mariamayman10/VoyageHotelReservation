@@ -1,7 +1,10 @@
 package org.example.voyage.booking;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -10,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface BookingRepository extends JpaRepository<Booking, UUID> {
+public interface BookingRepository extends JpaRepository<Booking, UUID>, JpaSpecificationExecutor<Booking> {
     @Query("""
                 SELECT COUNT(b) > 0 FROM Booking b
                 WHERE b.room.id = :roomId
@@ -25,4 +28,6 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     );
 
     List<Booking> findAllByUser_Id(UUID userId, Pageable pageable);
+
+    Page<Booking> findAll(Specification<Booking> spec, Pageable pageable);
 }

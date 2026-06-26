@@ -45,4 +45,10 @@ public class BookingController {
     public ResponseEntity<BookingResponse> getBookingById(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(bookingService.getMyBookingById(id, userDetails));
     }
+
+    @GetMapping("/hotels/{hotelId}/bookings")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<List<ManagerBookingResponse>> getAllHotelBookings(BookingSearchCriteria criteria, @PathVariable UUID hotelId, @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.status(HttpStatus.OK).body(bookingService.getHotelBookings(criteria, hotelId, userDetails));
+    }
 }

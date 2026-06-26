@@ -96,6 +96,11 @@ public class HotelService {
         return hotelMapper.toHotelResponse(hotel);
     }
 
+    public Hotel getHotelEntityById(UUID id){
+        return hotelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Hotel not found"));
+    }
+
     public void delete(UUID hotelId, UserDetails userDetails) {
         Hotel hotel = checkHotelOwn(hotelId, userDetails);
         boolean hasReservations = hotelRepository.hasReservations(hotelId, LocalDate.now());
