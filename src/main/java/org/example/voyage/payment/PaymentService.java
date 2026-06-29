@@ -62,7 +62,10 @@ public class PaymentService {
         if(!booking.getStatus().name().equals(Booking.BookingStatus.CANCELLED.name()))
             throw new NotAuthorizedException("Can't refund an active booking");
         Payment payment = paymentRepository.findByBookingId(bookingId);
-        payment.setStatus(Payment.PaymentStatus.REFUNDED);
+        if(payment.getStatus().equals(Payment.PaymentStatus.PENDING))
+            payment.setStatus(Payment.PaymentStatus.CANCELLED);
+        else if(payment.getStatus().equals(Payment.PaymentStatus.COMPLETED))
+            payment.setStatus(Payment.PaymentStatus.REFUNDED);
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
