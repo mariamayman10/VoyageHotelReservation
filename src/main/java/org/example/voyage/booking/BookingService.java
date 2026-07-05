@@ -7,10 +7,14 @@ import org.example.voyage.exception.OperationCanNotBeCompleted;
 import org.example.voyage.exception.RoomInUseException;
 import org.example.voyage.hotel.Hotel;
 import org.example.voyage.hotel.HotelService;
+import org.example.voyage.notification.dto.NotificationPayload;
 import org.example.voyage.room.Room;
 import org.example.voyage.room.RoomService;
 import org.example.voyage.user.User;
 import org.example.voyage.user.UserService;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -32,13 +37,22 @@ public class BookingService {
     private final UserService userService;
     private final RoomService roomService;
     private final HotelService hotelService;
+    private final AmqpTemplate amqpTemplate;
 
-    public BookingService(BookingRepository bookingRepository, BookingMapper bookingMapper, UserService userService, RoomService roomService, HotelService hotelService) {
+    @Value("${app.rabbitmq.exchange}")
+    private String exchange;
+    @Value("${app.rabbitmq.routing-keys.confirmed}")
+    private String confirmedKey;
+    @Value("${app.rabbitmq.routing-keys.cancelled}")
+    private String cancelledKey;
+
+    public BookingService(BookingRepository bookingRepository, BookingMapper bookingMapper, UserService userService, RoomService roomService, HotelService hotelService, AmqpTemplate amqpTemplate) {
         this.bookingRepository = bookingRepository;
         this.bookingMapper = bookingMapper;
         this.userService = userService;
         this.roomService = roomService;
         this.hotelService = hotelService;
+        this.amqpTemplate = amqpTemplate;
     }
 
     @Transactional
@@ -56,7 +70,9 @@ public class BookingService {
         BigDecimal days = new BigDecimal(ChronoUnit.DAYS.between(request.getCheckInDate(), request.getCheckOutDate()));
         booking.setTotalPrice(room.getPricePerNight().multiply(days));
         booking.setStatus(Booking.BookingStatus.PENDING);
-        return bookingMapper.toResponse(bookingRepository.save(booking));
+        booking = bookingRepository.save(booking);
+        publishNotification(booking, "CONFIRMED", confirmedKey);
+        return bookingMapper.toResponse(booking);
     }
 
     @Transactional
@@ -67,8 +83,10 @@ public class BookingService {
             throw new NotAuthorizedException("You are not allowed to cancel another user's booking");
         if(booking.getStatus().equals(Booking.BookingStatus.CANCELLED))
             throw new OperationCanNotBeCompleted("Booking is already cancelled");
-        if (booking.getCheckInDate().isAfter(LocalDate.now()))
+        if (booking.getCheckInDate().isAfter(LocalDate.now())){
             booking.setStatus(Booking.BookingStatus.CANCELLED);
+            publishNotification(booking, "CANCELLED", cancelledKey);
+        }
         else throw new OperationCanNotBeCompleted("You can't cancel booking with a passed check-in date");
     }
 
@@ -118,5 +136,20 @@ public class BookingService {
         if(!booking.getRoom().getHotel().getId().equals(hotel.getId()))
             throw new IllegalArgumentException("The booking doesn't belong to this hotel");
         return bookingMapper.toManagerBookingResponse(booking);
+    }
+
+    private void publishNotification(Booking booking, String eventType, String routingKey) {
+        var payload = new NotificationPayload(
+                booking.getId(),
+                booking.getUser().getName(),
+                booking.getUser().getEmail(),
+                booking.getRoom().getHotel().getName(),
+                booking.getCheckInDate().toString(),
+                booking.getCheckOutDate().toString(),
+                eventType,
+                LocalDateTime.now()
+        );
+
+        amqpTemplate.convertAndSend(exchange, routingKey, payload);
     }
 }
