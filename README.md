@@ -8,6 +8,7 @@ A hotel reservation REST API built with Spring Boot and PostgreSQL.
 
 - **Java 17** + **Spring Boot 3**
 - **Spring Security** + **JWT** for authentication
+- **RabbitMQ** for publishing events on booking confirmation/cancellation to the email notification service
 - **Spring Data JPA** + **Hibernate** for ORM
 - **PostgreSQL** for persistence
 - **Maven** for dependency management
@@ -43,6 +44,15 @@ A hotel reservation REST API built with Spring Boot and PostgreSQL.
 - Refund triggered on booking cancellation if payment was completed
 - Payment statuses: `PENDING`, `COMPLETED`, `CANCELLED`, `REFUNDED`
 - Email notification sent to customer on booking confirmation and cancellation
+
+### Notifications (RabbitMQ)
+- Booking events are published asynchronously to a RabbitMQ `DirectExchange` (`booking.events`)
+- Two routing keys are used: `booking.confirmed` and `booking.cancelled`
+- An `email.notifications` queue is bound to both routing keys
+- The `EmailNotificationService` listens on the queue via `@RabbitListener` and sends emails to guests
+- Messages are serialized as JSON using `JacksonJsonMessageConverter`
+- Both the exchange and queue are durable — messages survive a RabbitMQ restart
+- Failed deliveries are routed to a dead-letter exchange (`booking.events.dlx`) for inspection
 
 ---
 
@@ -110,6 +120,8 @@ A hotel reservation REST API built with Spring Boot and PostgreSQL.
 | `POST` | `/api/payments/pay/{bookingId}` | Customer |
 | `POST` | `/api/payments/refund/{bookingId}` | Customer |
 
+---
+
 ## Project Structure
 
 ```
@@ -122,8 +134,8 @@ src/main/java/org/example/voyage/
 ├── room/               # Room entity, controller, service, repository, specifications
 ├── booking/            # Booking entity, controller, service, repository, specifications
 ├── payment/            # Payment entity, controller, service, repository
-├── notification/       # Email service, notification publisher
+├── notification/       # Email notification consumer and payload DTO
 ├── security/           # JwtFilter, UserDetailsImpl, UserPrincipal
-├── exception/          # Global Exception Handler and Custom created exception
-└── config/             # Configurations for Jwt, OpenApi, Security, RabbitMQ
+├── exception/          # Global Exception Handler and custom exceptions
+└── config/             # Configurations for JWT, OpenApi, Security, RabbitMQ
 ```
